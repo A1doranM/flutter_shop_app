@@ -13,7 +13,7 @@ class CartItem {
       @required this.price});
 }
 
-class Cart with ChangeNotifier {
+class CartProvider with ChangeNotifier {
   Map<String, CartItem> _items;
 
   Map<String, CartItem> get items {
