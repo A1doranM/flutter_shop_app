@@ -23,6 +23,10 @@ class ProductsProvider with ChangeNotifier {
     return [..._items];
   }
 
+  List<Product> get favouriteItems {
+    return _items.where((element) => element.isFavourite).toList();
+  }
+
   Product findById(String id) {
     return _items.firstWhere((product) => product.id == id);
   }
