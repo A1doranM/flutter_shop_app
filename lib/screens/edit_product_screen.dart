@@ -41,6 +41,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _updateImageUrl() {
     if (!_imageUrlFocusNode.hasFocus) {
+      if (_imageUrlController.text.isEmpty) {
+        return;
+      }
+      if (!_imageUrlController.text.startsWith('http') ||
+          !_imageUrlController.text.startsWith('https')) {
+        return;
+      }
       setState(() {});
     }
   }
@@ -121,6 +128,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     if (value.isEmpty) {
                       return 'Description must not be null.';
                     }
+                    if (value.length < 20 || value.length > 300) {
+                      return 'Min length is 20 and max length is 300 characters.';
+                    }
                     return null;
                   },
                   onSaved: (value) {
@@ -161,6 +171,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         validator: (value) {
                           if (value.isEmpty) {
                             return 'URL must not be null.';
+                          }
+                          if (!value.startsWith('http') ||
+                              !value.startsWith('https')) {
+                            return 'URL is not valid';
                           }
                           return null;
                         },
