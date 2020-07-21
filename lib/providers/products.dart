@@ -55,24 +55,27 @@ class Products with ChangeNotifier {
 
   void addProduct(Product product) {
     const url = 'https://dartfluttershopapp.firebaseio.com/products.json';
-    http.post(url,
-        body: json.encode({
-          'title': product.title,
-          'description': product.description,
-          'imageU rl': product.imageUrl,
-          'price': product.price,
-          'isFavourite': product.isFavorite
-        }));
+    http
+        .post(url,
+            body: json.encode({
+              'title': product.title,
+              'description': product.description,
+              'imageU rl': product.imageUrl,
+              'price': product.price,
+              'isFavourite': product.isFavorite
+            }))
+        .then((response) {
+      final newProduct = Product(
+        id: DateTime.now().toString(),
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+      );
 
-    final newProduct = Product(
-      id: DateTime.now().toString(),
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-    );
-    _items.add(newProduct);
-    notifyListeners();
+      _items.add(newProduct);
+      notifyListeners();
+    });
   }
 
   void updateProduct(String id, Product newProduct) {
