@@ -49,4 +49,38 @@ class Orders with ChangeNotifier {
             dateTime: DateTime.now()));
     notifyListeners();
   }
+
+  Future<void> fetchAndSetOrders() async {
+    const url = 'https://dartfluttershopapp.firebaseio.com/orders.json';
+    try {
+      final http.Response response = await http.get(url);
+      final Map<String, dynamic> extractedData =
+          json.decode(response.body) as Map<String, dynamic>;
+      if (extractedData == null) {
+        return;
+      }
+      final List<OrderItem> loadedOrders = [];
+
+      extractedData.forEach((orderId, orderData) {
+        loadedOrders.add(OrderItem(
+          id: orderId,
+          amount: orderData['amount'],
+          products: (orderData['products'] as List<dynamic>)
+              .map((item) => CartItem(
+                  id: item['id'],
+                  price: item['price'],
+                  quantity: item['quantity'],
+                  title: item['title']))
+              .toList(),
+          dateTime: DateTime.parse(orderData['dateTime']),
+        ));
+      });
+
+      _orders = loadedOrders;
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
 }
