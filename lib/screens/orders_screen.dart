@@ -5,49 +5,40 @@ import '../providers/orders.dart' show Orders;
 import '../widgets/app_drawer.dart';
 import '../widgets/order_item.dart';
 
-class OrdersScreen extends StatefulWidget {
+class OrdersScreen extends StatelessWidget {
   static const routeName = '/orders';
 
   @override
-  _OrdersScreenState createState() => _OrdersScreenState();
-}
-
-class _OrdersScreenState extends State<OrdersScreen> {
-  bool _isLoading = false;
-
-  @override
   Widget build(BuildContext context) {
-    final ordersData = Provider.of<Orders>(context);
-
     return Scaffold(
       appBar: AppBar(
         title: Text('Your Orders'),
       ),
-      body: _isLoading
-          ? Center(
+      body: FutureBuilder(
+        future: Provider.of<Orders>(context, listen: false).fetchAndSetOrders(),
+        builder: (ctx, dataSnapshot) {
+          if (dataSnapshot.connectionState == ConnectionState.waiting) {
+            return Center(
               child: CircularProgressIndicator(),
-            )
-          : ListView.builder(
-              itemCount: ordersData.orders.length,
-              itemBuilder: (ctx, i) => OrderItem(
-                order: ordersData.orders[i],
+            );
+          } else if (dataSnapshot.connectionState == ConnectionState.done) {
+            return Consumer<Orders>(
+              builder: (ctx, orderData, child) => ListView.builder(
+                itemCount: orderData.orders.length,
+                itemBuilder: (ctx, i) => OrderItem(
+                  order: orderData.orders[i],
+                ),
               ),
-            ),
+            );
+          } else if (dataSnapshot.error != null) {
+            return Center(
+              child: Text('Error occurred!'),
+            );
+          }
+          return Text('');
+        },
+      ),
       drawer: AppDrawer(),
     );
-  }
-
-  @override
-  void initState() {
-    Future.delayed(Duration.zero).then((_) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<Orders>(context, listen: false).fetchAndSetOrders();
-      setState(() {
-        _isLoading = false;
-      });
-    });
-    super.initState();
   }
 }
