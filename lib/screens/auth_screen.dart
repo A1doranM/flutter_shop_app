@@ -137,9 +137,6 @@ class _AuthCardState extends State<AuthCard> {
         await Provider.of<Auth>(context, listen: false)
             .signUp(email: _authData['email'], password: _authData['password']);
       }
-      setState(() {
-        _isLoading = false;
-      });
     } on HttpException catch (error) {
       String errorMessage = 'Authentication failed.';
 

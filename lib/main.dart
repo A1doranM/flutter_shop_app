@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_shop_app/screens/products_overview_screen.dart';
 import 'package:provider/provider.dart';
 
 import './providers/auth.dart';
@@ -32,21 +33,27 @@ class MyApp extends StatelessWidget {
           value: Auth(),
         )
       ],
-      child: MaterialApp(
-          title: 'MyShop',
-          theme: ThemeData(
-            primarySwatch: Colors.purple,
-            accentColor: Colors.deepOrange,
-            fontFamily: 'Lato',
-          ),
-          home: AuthScreen(),
-          routes: {
-            ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
-            CartScreen.routeName: (ctx) => CartScreen(),
-            OrdersScreen.routeName: (ctx) => OrdersScreen(),
-            UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
-            EditProductScreen.routeName: (ctx) => EditProductScreen(),
-          }),
+      child: Consumer<Auth>(
+        builder: (ctx, auth, _) {
+          return MaterialApp(
+              title: 'MyShop',
+              theme: ThemeData(
+                primarySwatch: Colors.purple,
+                accentColor: Colors.deepOrange,
+                fontFamily: 'Lato',
+              ),
+              home: !auth.isAuth ? AuthScreen() : ProductsOverviewScreen(),
+              routes: {
+                ProductsOverviewScreen.routeName: (ctx) =>
+                    ProductsOverviewScreen(),
+                ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
+                CartScreen.routeName: (ctx) => CartScreen(),
+                OrdersScreen.routeName: (ctx) => OrdersScreen(),
+                UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
+                EditProductScreen.routeName: (ctx) => EditProductScreen(),
+              });
+        },
+      ),
     );
   }
 }
