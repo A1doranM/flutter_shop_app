@@ -7,7 +7,13 @@ import './product.dart';
 import '../models/http_exception.dart';
 
 class Products with ChangeNotifier {
-  List<Product> _items = [];
+  List<Product> _items;
+  final String authToken;
+
+  Products(
+    this._items, {
+    this.authToken,
+  });
 
   List<Product> get items {
     return [..._items];
@@ -22,7 +28,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
-    const url = 'https://dartfluttershopapp.firebaseio.com/products.json';
+    final url =
+        'https://dartfluttershopapp.firebaseio.com/products.json?auth=$authToken';
     try {
       final http.Response response = await http.post(url,
           body: json.encode({
@@ -52,7 +59,8 @@ class Products with ChangeNotifier {
   Future<void> updateProduct(String id, Product newProduct) async {
     final int prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
-      final url = 'https://dartfluttershopapp.firebaseio.com/products/$id.json';
+      final url =
+          'https://dartfluttershopapp.firebaseio.com/products/$id.json?auth=$authToken';
       await http.patch(url,
           body: json.encode({
             'title': newProduct.title,
@@ -67,7 +75,7 @@ class Products with ChangeNotifier {
 
   Future<void> deleteProduct(String id) async {
     final String url =
-        'https://dartfluttershopapp.firebaseio.com/products/$id.json';
+        'https://dartfluttershopapp.firebaseio.com/products/$id.json?auth=$authToken';
     final int existingProductIndex = _items.indexWhere((prod) => prod.id == id);
     Product existingProduct = _items[existingProductIndex];
     _items.removeAt(existingProductIndex);
@@ -83,7 +91,8 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    const url = 'https://dartfluttershopapp.firebaseio.com/products.json';
+    final url =
+        'https://dartfluttershopapp.firebaseio.com/products.json?auth=$authToken';
     try {
       final http.Response response = await http.get(url);
       final Map<String, dynamic> extractedData =
