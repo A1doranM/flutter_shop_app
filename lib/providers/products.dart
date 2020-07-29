@@ -9,11 +9,9 @@ import '../models/http_exception.dart';
 class Products with ChangeNotifier {
   List<Product> _items;
   final String authToken;
+  final String userId;
 
-  Products(
-    this._items, {
-    this.authToken,
-  });
+  Products(this._items, {this.authToken, this.userId});
 
   List<Product> get items {
     return [..._items];
@@ -91,7 +89,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    final url =
+    String url =
         'https://dartfluttershopapp.firebaseio.com/products.json?auth=$authToken';
     try {
       final http.Response response = await http.get(url);
@@ -100,16 +98,22 @@ class Products with ChangeNotifier {
       if (extractedData == null) {
         return;
       }
+
+      url =
+          'https://dartfluttershopapp.firebaseio.com/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
       final List<Product> loadedProducts = [];
 
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
-            id: prodId,
-            title: prodData['title'],
-            description: prodData['description'],
-            price: prodData['price'],
-            isFavorite: prodData['isFavourite'],
-            imageUrl: prodData['imageUrl']));
+          id: prodId,
+          title: prodData['title'],
+          description: prodData['description'],
+          price: prodData['price'],
+          isFavorite: prodData['isFavourite'],
+          imageUrl: favoriteData[prodId] ?? false,
+        ));
       });
 
       _items = loadedProducts;
